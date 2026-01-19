@@ -396,6 +396,30 @@
   const ramos = document.querySelectorAll('.ramo');
   const semestres = document.querySelectorAll('.semestre');
 
+// === TOOLTIP AUTOMÁTICO DE PRERREQUISITOS ===
+const nombresRamos = {};
+
+// Guardar nombre de cada ramo por su data-id
+ramos.forEach(r => {
+  nombresRamos[r.dataset.id] = r.textContent.trim();
+});
+
+// Crear tooltip usando data-prereq
+ramos.forEach(r => {
+  if (r.dataset.prereq) {
+    const requisitosTexto = r.dataset.prereq
+      .split(',')
+      .map(id => nombresRamos[id])
+      .filter(Boolean)
+      .join(', ');
+
+    r.setAttribute(
+      'data-tooltip',
+      'Requisito' + (r.dataset.prereq.includes(',') ? 's' : '') + ': ' + requisitosTexto
+    );
+  }
+});
+  
   // === CLICK EN RAMOS ===
   ramos.forEach(r => {
     r.addEventListener('click', () => {

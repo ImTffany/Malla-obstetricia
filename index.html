@@ -1,1 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Malla Interactiva – Obstetricia UDP</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(
+        180deg,
+        #fff6f8 0%,
+        #fafafa 40%,
+        #ffffff 100%
+      );
+      padding: 20px;
+    }
 
+    .titulo {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .titulo h1 {
+      font-size: 36px;
+      color: #812232;
+      margin-bottom: 4px;
+    }
+
+    /* animación SOLO cuando carrera completa */
+    body.carrera-completa .titulo h1 {
+      animation: tituloSuave 3.5s ease-in-out infinite;
+    }
+
+    .titulo h2 {
+      font-size: 14px;
+      font-weight: normal;
+      color: #555;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    #progreso {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .barra-progreso {
+      width: 80%;
+      height: 16px;
+      background: #e0e0e0;
+      border-radius: 10px;
+      margin: 0 auto 25px;
+      overflow: hidden;
+    }
+
+    .barra-progreso span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #f6b7cc, #ffe28a);
+      transition: width 0.4s;
+    }
+
+    /* contenedor vertical por columnas */
+    .malla {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 14px;
+      align-items: start;
+      overflow-x: auto;
+      padding-bottom: 10px;
+    }
+
+    .semestre {
+      background: linear-gradient(180deg, #f7f7f7, #eeeeee);
+      border-radius: 16px;
+      padding: 12px 10px 14px;
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      position: relative;
+    }
+
+    /* franja superior como estaba originalmente */
+.semestre::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 6px;
+  width: 100%;
+  background: linear-gradient(90deg, #dcdcdc, #f2f2f2);
+  border-radius: 16px 16px 0 0;
+}
+
+/* sin franjas por año */
+
+    /* franjas de año */
+    .anio {
+      grid-column: span 2;
+      background: #812232;
+      color: #fff;
+      text-align: center;
+      padding: 10px 0;
+      border-radius: 12px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .anio-1 { background:#D35A6E; }
+    .anio-2 { background:#812232; }
+    .anio-3 { background:#A3001B; }
+    .anio-4 { background:#47000B; }
+    .anio-5 { background:#F58438; }
+    .anio-2 .semestre { background:#fff3d6; }
+    .anio-3 .semestre { background:#eef7f1; }
+    .anio-4 .semestre { background:#eef1fa; }
+    .anio-5 .semestre { background:#f5eef8; }
+
+    /* vista mobile */
+    @media (max-width: 768px) {
+      .malla {
+        grid-template-columns: repeat(1, 1fr);
+      }
+      .anio { margin-top:20px; font-size:18px; }
+    }
+
+    .semestre {
+      background: #f0f0f0;
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .semestre h2 {
+      text-align: center;
+      font-size: 15px;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed rgba(0,0,0,0.15);
+      color: #812232;
+    }
+
+    body.dark .semestre h2 {
+      color: #f6b7cc;
+      border-bottom: 1px dashed rgba(255,255,255,0.2);
+    }
+
+    .ramo {
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      transition: 0.3s;
+      font-size: 13px;
+      margin-bottom: 8px;
+      font-weight: bold;
+      position: relative;
+      color: #47000B;
+    }
+
+    .ramo:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 110%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      padding: 6px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      white-space: nowrap;
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    /* estados */
+    .pendiente { background: #f6b7cc; }
+    .aprobado { background: #ffe28a; text-decoration: line-through; color: #5a1a20; animation: aprobadoPop 0.4s ease; }
+    .bloqueado { background: #d0d0d0; color: #777; cursor: not-allowed; }
+
+    /* ciclos formativos */
+    .basico { border-left: 6px solid #D35A6E; }
+    .licenciatura { border-left: 6px solid #812232; }
+    .profesional { border-left: 6px solid #A3001B; }
+    .internado { border-left: 6px solid #F58438; }
+  
+    /* ===== MODO OSCURO ===== */
+    body.dark {
+      background: linear-gradient(180deg, #1a0d12 0%, #12070a 100%);
+      color: #f2f2f2;
+    }
+
+    body.dark .semestre {
+      background: linear-gradient(180deg, #2c2c2c, #242424);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.6);
+    }
+
+    body.dark .semestre::before {
+      background: linear-gradient(90deg, #555, #333);
+    }
+    body.dark .ramo.pendiente { background:#5c1f2a; color:#fff; }
+    body.dark .ramo.aprobado { background:#cfae4b; color:#2a1a00; }
+    body.dark .ramo.bloqueado { background:#444; color:#999; }
+    body.dark .barra-progreso { background:#333; }
+
+    /* animación año completado */
+    .anio.completado {
+      animation: brillo 1.2s ease-in-out;
+    }
+
+    @keyframes aprobadoPop {
+      0% { transform: scale(1); box-shadow: 0 0 0 rgba(255,226,138,0); }
+      50% { transform: scale(1.05); box-shadow: 0 0 12px rgba(255,226,138,0.9); }
+      100% { transform: scale(1); box-shadow: 0 0 0 rgba(255,226,138,0); }
+    }
+
+    @keyframes tituloSuave {
+      0% { transform: translateY(0); letter-spacing: 0px; }
+      50% { transform: translateY(-4px); letter-spacing: 1px; }
+      100% { transform: translateY(0); letter-spacing: 0px; }
+    }
+
+    @keyframes brillo {
+      0% { box-shadow: 0 0 0 0 rgba(255,226,138,0.9); }
+      50% { box-shadow: 0 0 20px 6px rgba(255,226,138,0.9); }
+      100% { box-shadow: 0 0 0 0 rgba(255,226,138,0); }
+    }
+  
+    /* ===== PORTADA PDF ===== */
+    @media print {
+      body { background: white; }
+
+      header.titulo {
+        page-break-after: always;
+        margin-top: 200px;
+      }
+
+      header.titulo h1 {
+        font-size: 42px;
+        color: #812232;
+      }
+
+      header.titulo h2 {
+        font-size: 18px;
+        letter-spacing: 2px;
+      }
+
+      .barra-progreso,
+      #progreso,
+      #progreso-anios,
+      button {
+        display: none;
+      }
+
+      .malla {
+        page-break-before: always;
+      }
+    }
+  /* ===== CONFETI ===== */
+.confetti {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  background: red;
+  top: -10px;
+  animation: caer 1.5s linear forwards;
+  z-index: 9999;
+}
+
+@keyframes caer {
+  to {
+    transform: translateY(110vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<header class="titulo">
+  <h1>Obstetricia y Puericultura</h1>
+  <h2>Universidad Diego Portales</h2>
+  
+</header>
+
+<div id="progreso"></div>
+<div class="barra-progreso"><span id="barra"></span></div>
+
+<div style="text-align:center; margin-bottom:20px;">
+  <button onclick="document.body.classList.toggle('dark')">🌙 Modo oscuro</button>
+  <button onclick="window.print()">🖨️ Exportar / Imprimir</button>
+</div>
+
+<div class="malla">
+
+  <!-- contenedor Año 1 -->
+  <div class="anio anio-1" style="grid-column: 1 / span 2;">Año 1</div>
+
+  <div class="anio anio-2" style="grid-column: 3 / span 2;">Año 2</div>
+  <div class="anio anio-3" style="grid-column: 5 / span 2;">Año 3</div>
+  <div class="anio anio-4" style="grid-column: 7 / span 2;">Año 4</div>
+  <div class="anio anio-5" style="grid-column: 9 / span 2;">Año 5</div>
+
+  
+  <div class="semestre">
+    <h2>Sem 1</h2>
+    <div class="ramo pendiente basico" data-id="bases">Bases Científicas del Funcionamiento Humano</div>
+    <div class="ramo pendiente basico" data-id="mental">Cuidados en Salud Mental</div>
+    <div class="ramo pendiente basico" data-id="fundamentos">Fundamentos de la Matronería</div>
+    <div class="ramo pendiente basico" data-id="genero">Salud con Perspectiva de Género</div>
+  </div>
+
+  <!-- SEMESTRE 2 -->
+  <div class="semestre">
+    <h2>Sem 2</h2>
+    <div class="ramo bloqueado basico" data-id="morfo1" data-prereq="bases">Morfofunción I</div>
+    <div class="ramo pendiente basico" data-id="sexual">Salud Sexual Integral</div>
+    <div class="ramo pendiente basico" data-id="pam">Clínica de PAM</div>
+    <div class="ramo pendiente basico" data-id="ingles1">Inglés General I</div>
+  </div>
+
+  <!-- SEMESTRE 3 -->
+  <div class="semestre">
+    <h2>Sem 3</h2>
+    <div class="ramo bloqueado basico" data-id="morfo2" data-prereq="morfo1">Morfofunción II</div>
+    <div class="ramo pendiente basico" data-id="rn">Cuidado Integral RN Sano</div>
+    <div class="ramo pendiente basico" data-id="puerperio">Periodo Grávido Puerperal</div>
+    <div class="ramo pendiente basico" data-id="reproductiva">Atención en Salud Reproductiva</div>
+  </div>
+
+  <!-- SEMESTRE 4 -->
+  <div class="semestre">
+    <h2>Sem 4</h2>
+    <div class="ramo bloqueado licenciatura" data-id="patologias" data-prereq="morfo2">Abordaje Integral de Patologías Frecuentes</div>
+    <div class="ramo bloqueado licenciatura" data-id="rn-pat" data-prereq="rn">RN con Patologías</div>
+    <div class="ramo pendiente licenciatura" data-id="alto-riesgo">Alto Riesgo Obstétrico</div>
+    <div class="ramo pendiente licenciatura" data-id="ingles2">Inglés General II</div>
+  </div>
+
+  <!-- SEMESTRE 5 -->
+  <div class="semestre">
+    <h2>Sem 5</h2>
+    <div class="ramo bloqueado licenciatura" data-id="clinica-fisio" data-prereq="alto-riesgo">Clínica Integrada Fisiológica</div>
+    <div class="ramo pendiente licenciatura" data-id="gestion">Gestión en Salud</div>
+    <div class="ramo pendiente licenciatura" data-id="minor1">Minor Formación General</div>
+  </div>
+
+  <!-- SEMESTRE 6 -->
+  <div class="semestre">
+    <h2>Sem 6</h2>
+    <div class="ramo bloqueado licenciatura" data-id="perinatal" data-prereq="clinica-fisio">Cuidados Perinatales Alto Riesgo</div>
+    <div class="ramo pendiente licenciatura" data-id="bioetica">Bioética y Aspectos Legales</div>
+    <div class="ramo pendiente licenciatura" data-id="gine">Atención Ginecológica</div>
+  </div>
+
+  <!-- SEMESTRE 7 -->
+  <div class="semestre">
+    <h2>Sem 7</h2>
+    <div class="ramo bloqueado profesional" data-id="simulacion" data-prereq="perinatal,clinica-fisio">Integrado Disciplinar Simulación</div>
+    <div class="ramo pendiente profesional" data-id="investigacion">Fundamentos de Investigación</div>
+    <div class="ramo pendiente profesional" data-id="calidad">Calidad y Seguridad</div>
+  </div>
+
+  <!-- SEMESTRE 8 -->
+  <div class="semestre">
+    <h2>Sem 8</h2>
+    <div class="ramo bloqueado profesional" data-id="clinica-pat" data-prereq="simulacion">Clínica Integrada Patológica</div>
+    <div class="ramo pendiente profesional" data-id="innovacion">Innovación en Salud</div>
+    <div class="ramo pendiente profesional" data-id="invest-ap">Investigación Aplicada</div>
+  </div>
+
+  <!-- SEMESTRE 9 -->
+  <div class="semestre">
+    <h2>Sem 9</h2>
+    <div class="ramo bloqueado internado" data-id="internado1" data-prereq="clinica-pat" data-lock="true">Internado Profesional I</div>
+    <div class="ramo bloqueado internado" data-id="internado2" data-prereq="clinica-pat" data-lock="true">Internado Profesional II</div>
+  </div>
+
+  <!-- SEMESTRE 10 -->
+  <div class="semestre">
+    <h2>Sem 10</h2>
+    <div class="ramo bloqueado internado" data-id="internado3" data-prereq="internado1,internado2" data-lock="true">Internado Profesional III</div>
+    <div class="ramo bloqueado internado" data-id="internado4" data-prereq="internado1,internado2" data-lock="true">Internado Profesional IV</div>
+  </div>
+
+</div>
+
+<script>
+  const ramos = document.querySelectorAll('.ramo');
+  const semestres = document.querySelectorAll('.semestre');
+
+  // === CLICK EN RAMOS ===
+  ramos.forEach(r => {
+    r.addEventListener('click', () => {
+      if (r.classList.contains('bloqueado')) return;
+
+      const aprobado = r.classList.toggle('aprobado');
+      r.classList.toggle('pendiente', !aprobado);
+
+      guardarEstado();
+      actualizarBloqueos();
+      actualizarProgreso();
+      revisarSemestres();
+    });
+  });
+
+  // === PRERREQUISITOS ===
+  function requisitosCumplidos(prereq) {
+    if (!prereq) return true;
+    return prereq.split(',').every(id =>
+      document.querySelector(`[data-id="${id}"]`)?.classList.contains('aprobado')
+    );
+  }
+
+  function actualizarBloqueos() {
+    ramos.forEach(r => {
+      if (r.classList.contains('aprobado')) {
+        r.classList.remove('bloqueado');
+        r.classList.add('pendiente');
+        return;
+      }
+      const prereq = r.dataset.prereq;
+      if (!requisitosCumplidos(prereq)) {
+        r.classList.add('bloqueado');
+        r.classList.remove('pendiente');
+      } else {
+        r.classList.remove('bloqueado');
+        r.classList.add('pendiente');
+      }
+    });
+  }
+
+  // === GUARDADO ===
+  function guardarEstado() {
+    const estado = {};
+    ramos.forEach(r => {
+      if (r.classList.contains('aprobado')) estado[r.dataset.id] = true;
+    });
+    localStorage.setItem('estadoRamos', JSON.stringify(estado));
+  }
+
+  function cargarEstado() {
+    const estado = JSON.parse(localStorage.getItem('estadoRamos')) || {};
+    ramos.forEach(r => {
+      if (estado[r.dataset.id]) {
+        r.classList.add('aprobado');
+        r.classList.remove('pendiente');
+      }
+    });
+  }
+
+  // === PROGRESO ===
+  function actualizarProgreso() {
+    const total = ramos.length;
+    const aprobados = document.querySelectorAll('.ramo.aprobado').length;
+    const porcentaje = Math.round((aprobados / total) * 100);
+
+    document.getElementById('progreso').textContent = `Progreso total: ${porcentaje}%`;
+    document.getElementById('barra').style.width = porcentaje + '%';
+  }
+
+  // === CONFETI ===
+  function lanzarConfeti(cantidad = 40) {
+    const colores = ['#ffe28a', '#f6b7cc', '#D35A6E', '#F58438'];
+    for (let i = 0; i < cantidad; i++) {
+      const conf = document.createElement('div');
+      conf.className = 'confetti';
+      conf.style.left = Math.random() * 100 + 'vw';
+      conf.style.background = colores[Math.floor(Math.random() * colores.length)];
+      conf.style.animationDuration = 1 + Math.random() + 's';
+      document.body.appendChild(conf);
+      setTimeout(() => conf.remove(), 2000);
+    }
+  }
+
+  // === SEMESTRES Y CARRERA ===
+  function revisarSemestres() {
+    semestres.forEach(sem => {
+      if (sem.dataset.completado) return;
+      const ramosSem = sem.querySelectorAll('.ramo');
+      const aprobados = sem.querySelectorAll('.ramo.aprobado');
+      if (ramosSem.length > 0 && ramosSem.length === aprobados.length) {
+        sem.dataset.completado = 'true';
+        lanzarConfeti();
+      }
+    });
+    revisarCarrera();
+  }
+
+  function revisarCarrera() {
+    const total = ramos.length;
+    const aprobados = document.querySelectorAll('.ramo.aprobado').length;
+    if (total > 0 && total === aprobados && !document.body.classList.contains('carrera-completa')) {
+      document.body.classList.add('carrera-completa');
+      lanzarConfeti(120);
+    }
+  }
+
+  // === INIT ===
+  cargarEstado();
+  actualizarBloqueos();
+  actualizarProgreso();
+  revisarSemestres();
+</script>
+
+</body>
+</html>

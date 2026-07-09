@@ -321,18 +321,20 @@
   <div class="semestre">
     <h2>Sem 2</h2>
     <div class="ramo bloqueado basico" data-id="morfo1" data-prereq="bases">Morfofunción I</div>
-    <div class="ramo pendiente basico" data-id="sexual">Salud Sexual Integral</div>
-    <div class="ramo pendiente basico" data-id="pam">Clínica de PAM</div>
-    <div class="ramo pendiente basico" data-id="ingles1">Inglés General I</div>
+    <div class="ramo pendiente basico" data-id="sexual" data-prereq="genero">Salud Sexual Integral</div>
+    <div class="ramo pendiente basico" data-id="pam" data-prereq="fundamentos">Clínica de PAM</div>
+    <div class="ramo pendiente basico" data-id="ingles1" >Inglés General I</div>
   </div>
 
   <!-- SEMESTRE 3 -->
   <div class="semestre">
     <h2>Sem 3</h2>
     <div class="ramo bloqueado basico" data-id="morfo2" data-prereq="morfo1">Morfofunción II</div>
-    <div class="ramo pendiente basico" data-id="rn">Cuidado Integral RN Sano</div>
-    <div class="ramo pendiente basico" data-id="puerperio">Periodo Grávido Puerperal</div>
-    <div class="ramo pendiente basico" data-id="reproductiva">Atención en Salud Reproductiva</div>
+    <div class="ramo pendiente basico" data-id="rn" data-prereq="pam">Cuidado Integral RN Sano</div>
+    <div class="ramo pendiente basico" data-id="puerperio" data-prereq="pam">Periodo Grávido Puerperal</div>
+    <div class="ramo pendiente basico" data-id="reproductiva" data-prereq="sexual">Atención en Salud Reproductiva</div>
+    <div class="ramo pendiente basico" data-id="ingles2" data-prereq="ingles1">Inglés General II</div>
+    <div class="ramo pendiente basico" data-id="cfg1">CFG 1</div>
   </div>
 
   <!-- SEMESTRE 4 -->
@@ -340,54 +342,61 @@
     <h2>Sem 4</h2>
     <div class="ramo bloqueado licenciatura" data-id="patologias" data-prereq="morfo2">Abordaje Integral de Patologías Frecuentes</div>
     <div class="ramo bloqueado licenciatura" data-id="rn-pat" data-prereq="rn">RN con Patologías</div>
-    <div class="ramo pendiente licenciatura" data-id="alto-riesgo">Alto Riesgo Obstétrico</div>
-    <div class="ramo pendiente licenciatura" data-id="ingles2">Inglés General II</div>
+    <div class="ramo pendiente licenciatura" data-id="alto-riesgo" data-prereq="puerperio">Alto Riesgo Obstétrico</div>
+    <div class="ramo pendiente licenciatura" data-id="ingles3" data-prereq="ingles2">Inglés General III</div>
+    <div class="ramo pendiente basico" data-id="cfg2">CFG 2</div>
   </div>
 
   <!-- SEMESTRE 5 -->
   <div class="semestre">
     <h2>Sem 5</h2>
-    <div class="ramo bloqueado licenciatura" data-id="clinica-fisio" data-prereq="alto-riesgo">Clínica Integrada Fisiológica</div>
+    <div class="ramo bloqueado licenciatura" data-id="clinica-fisio" data-prereq="patologias,alto-riesgo,rn-pat">Clínica Integrada Fisiológica</div>
     <div class="ramo pendiente licenciatura" data-id="gestion">Gestión en Salud</div>
-    <div class="ramo pendiente licenciatura" data-id="minor1">Minor Formación General</div>
+    <div class="ramo pendiente basico" data-id="cfg3">CFG 3</div>
+    <div class="ramo pendiente basico" data-id="cfg4">CFG 4</div>
   </div>
 
   <!-- SEMESTRE 6 -->
   <div class="semestre">
     <h2>Sem 6</h2>
-    <div class="ramo bloqueado licenciatura" data-id="perinatal" data-prereq="clinica-fisio">Cuidados Perinatales Alto Riesgo</div>
-    <div class="ramo pendiente licenciatura" data-id="bioetica">Bioética y Aspectos Legales</div>
-    <div class="ramo pendiente licenciatura" data-id="gine">Atención Ginecológica</div>
+    <div class="ramo bloqueado licenciatura" data-id="perinatal" data-prereq="rn-pat,alto-riesgo">Cuidados Perinatales Alto Riesgo</div>
+    <div class="ramo pendiente licenciatura" data-id="bioetica" data-prereq="gestion">Bioética y Aspectos Legales</div>
+    <div class="ramo pendiente licenciatura" data-id="gine" data-prereq="clinica-fisio">Atención Ginecológica</div>
+    <div class="ramo pendiente basico" data-id="cfg5">CFG 5</div>
+    <div class="ramo pendiente basico" data-id="cfg6">CFG 6</div>
   </div>
 
   <!-- SEMESTRE 7 -->
   <div class="semestre">
     <h2>Sem 7</h2>
     <div class="ramo bloqueado profesional" data-id="simulacion" data-prereq="perinatal,clinica-fisio">Integrado Disciplinar Simulación</div>
-    <div class="ramo pendiente profesional" data-id="investigacion">Fundamentos de Investigación</div>
-    <div class="ramo pendiente profesional" data-id="calidad">Calidad y Seguridad</div>
+    <div class="ramo pendiente profesional" data-id="investigacion" data-prereq="bioetica">Fundamentos de Investigación</div>
+    <div class="ramo pendiente profesional" data-id="calidad" data-prereq="gestion">Calidad y Seguridad</div>
+    <div class="ramo pendiente basico" data-id="electivo1" data-prereq="clinica-fisio">Electivo de formación Profesional I</div>
+    <div class="ramo pendiente basico" data-id="electivo2" data-prereq="clinica-fisio">Electivo de formación Profesional II</div>
+    <div class="ramo pendiente basico" data-id="electivo3" data-prereq="clinica-fisio">Electivo de formación Profesional III</div>
   </div>
 
   <!-- SEMESTRE 8 -->
   <div class="semestre">
     <h2>Sem 8</h2>
     <div class="ramo bloqueado profesional" data-id="clinica-pat" data-prereq="simulacion">Clínica Integrada Patológica</div>
-    <div class="ramo pendiente profesional" data-id="innovacion">Innovación en Salud</div>
-    <div class="ramo pendiente profesional" data-id="invest-ap">Investigación Aplicada</div>
+    <div class="ramo pendiente profesional" data-id="innovacion" data-prereq="gestion">Innovación en Salud</div>
+    <div class="ramo pendiente profesional" data-id="invest-ap" data-prereq="investigacion">Investigación Aplicada</div>
   </div>
 
   <!-- SEMESTRE 9 -->
   <div class="semestre">
     <h2>Sem 9</h2>
-    <div class="ramo bloqueado internado" data-id="internado1" data-prereq="clinica-pat" data-lock="true">Internado Profesional I</div>
-    <div class="ramo bloqueado internado" data-id="internado2" data-prereq="clinica-pat" data-lock="true">Internado Profesional II</div>
+    <div class="ramo bloqueado internado" data-id="internado1" data-prereq="clinica-pat" data-lock="true">Internado de Obstetricia</div>
+    <div class="ramo bloqueado internado" data-id="internado2" data-prereq="clinica-pat" data-lock="true">Internado de Neonatología</div>
   </div>
 
   <!-- SEMESTRE 10 -->
   <div class="semestre">
     <h2>Sem 10</h2>
-    <div class="ramo bloqueado internado" data-id="internado3" data-prereq="internado1,internado2" data-lock="true">Internado Profesional III</div>
-    <div class="ramo bloqueado internado" data-id="internado4" data-prereq="internado1,internado2" data-lock="true">Internado Profesional IV</div>
+    <div class="ramo bloqueado internado" data-id="internado3" data-prereq="internado1,internado2" data-lock="true">Internado de Ginecología</div>
+    <div class="ramo bloqueado internado" data-id="internado4" data-prereq="internado1,internado2" data-lock="true">Internado de APS</div>
   </div>
 
 </div>
